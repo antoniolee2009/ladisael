@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ladisael Advocacia — Plataforma Jurídica IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #0F0F0D;
+  color: #E8E4DC;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── CSS VARIABLES ── */
+:root {
+  --gold: #C4A35A;
+  --gold-light: #D9BF85;
+  --gold-dim: #8A7040;
+  --dark: #0F0F0D;
+  --dark2: #161614;
+  --dark3: #1E1E1B;
+  --dark4: #262622;
+  --border: rgba(196,163,90,0.18);
+  --border-dim: rgba(255,255,255,0.07);
+  --text: #E8E4DC;
+  --text-muted: #7A7670;
+  --text-dim: #4A4742;
+  --success: #4A8C5C;
+  --warning: #B87B2A;
+  --danger: #8C3A3A;
+  --info: #2A5C8C;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --transition: 0.18s ease;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--dark2); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+
+/* ── LAYOUT ── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--dark2);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--border-dim);
+}
+.brand-logo {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
+}
+.logo-box {
+  width: 36px; height: 36px; background: var(--gold);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+}
+.logo-box span { font-family: 'Playfair Display', serif; color: #0F0F0D; font-size: 20px; font-weight: 700; line-height: 1; }
+.brand-text .name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--text); }
+.brand-text .sub { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.sidebar-section { padding: 1.25rem 1rem 0.5rem; }
+.sidebar-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 6px; padding: 0 0.25rem; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  color: var(--text-muted); font-size: 13px; font-weight: 400;
+  transition: all var(--transition); user-select: none;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--dark3); color: var(--text); }
+.nav-item.active { background: rgba(196,163,90,0.12); color: var(--gold); }
+.nav-item .icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item .badge-count {
+  margin-left: auto; background: var(--danger);
+  color: #fff; font-size: 10px; padding: 1px 6px;
+  border-radius: 20px; font-weight: 500;
+}
+
+.sidebar-footer {
+  margin-top: auto; padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-dim);
+}
+.user-info { display: flex; align-items: center; gap: 10px; }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #0F0F0D; flex-shrink: 0;
+}
+.user-name { font-size: 12px; font-weight: 500; color: var(--text); }
+.user-role { font-size: 10px; color: var(--text-muted); }
+.ai-status {
+  margin-top: 0.75rem; display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--gold);
+}
+.ai-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* ── TOPBAR ── */
+.topbar {
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid var(--border-dim);
+  display: flex; align-items: center; gap: 16px;
+  background: var(--dark2); flex-shrink: 0;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); flex: 1; }
+.topbar-breadcrumb { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.topbar-breadcrumb span { color: var(--gold); }
+.topbar-actions { display: flex; gap: 8px; }
+
+/* ── CONTENT ── */
+.content { padding: 1.75rem; flex: 1; }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── GRID LAYOUTS ── */
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--dark3); border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg); padding: 1.25rem;
+}
+.card-gold { border-color: var(--border); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.card-title { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text); }
+.card-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── METRIC CARDS ── */
+.metric {
+  background: var(--dark3); border: 1px solid var(--border-dim);
+  border-radius: var(--radius); padding: 1rem 1.25rem;
+  position: relative; overflow: hidden;
+}
+.metric::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--gold); opacity: 0.4;
+}
+.metric.m-success::before { background: #4A8C5C; }
+.metric.m-warning::before { background: #B87B2A; }
+.metric.m-danger::before { background: #8C3A3A; }
+.metric.m-info::before { background: #2A5C8C; }
+.metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; }
+.metric-value { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text); line-height: 1; }
+.metric-delta { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.metric-delta.up { color: #4A8C5C; }
+.metric-delta.down { color: #8C3A3A; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Playfair Display', serif; font-size: 15px;
+  color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border-dim); }
+
+/* ── TAGS / BADGES ── */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; padding: 3px 8px; border-radius: 20px;
+  font-weight: 500; letter-spacing: 0.04em;
+}
+.tag-gold { background: rgba(196,163,90,0.15); color: var(--gold); border: 1px solid rgba(196,163,90,0.3); }
+.tag-success { background: rgba(74,140,92,0.15); color: #6BBF85; border: 1px solid rgba(74,140,92,0.3); }
+.tag-warning { background: rgba(184,123,42,0.15); color: #E09B4A; border: 1px solid rgba(184,123,42,0.3); }
+.tag-danger { background: rgba(140,58,58,0.15); color: #E07070; border: 1px solid rgba(140,58,58,0.3); }
+.tag-info { background: rgba(42,92,140,0.15); color: #70A8E0; border: 1px solid rgba(42,92,140,0.3); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  transition: all var(--transition); border: none; outline: none;
+}
+.btn-primary { background: var(--gold); color: #0F0F0D; }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-secondary { background: var(--dark4); color: var(--text); border: 1px solid var(--border-dim); }
+.btn-secondary:hover { border-color: var(--border); color: var(--gold); }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border-dim); }
+.btn-ghost:hover { color: var(--text); border-color: var(--border-dim); background: var(--dark4); }
+.btn-danger { background: rgba(140,58,58,0.2); color: #E07070; border: 1px solid rgba(140,58,58,0.3); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-icon { padding: 8px; }
+
+/* ── INPUTS ── */
+input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="search"], select, textarea {
+  background: var(--dark4); border: 1px solid var(--border-dim);
+  color: var(--text); border-radius: 8px; padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
+  transition: border-color var(--transition); width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--border); }
+input::placeholder, textarea::placeholder { color: var(--text-dim); }
+select option { background: var(--dark3); }
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.form-group { margin-bottom: 1rem; }
+.form-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border-dim); }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-dim); background: var(--dark4); font-weight: 500; }
+td { padding: 11px 14px; font-size: 12px; color: var(--text); border-bottom: 1px solid var(--border-dim); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--dark4); }
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+
+/* ── AI TOOL CARDS ── */
+.tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+.tool-card {
+  background: var(--dark3); border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg); padding: 1.25rem; cursor: pointer;
+  transition: all var(--transition);
+}
+.tool-card:hover { border-color: var(--border); transform: translateY(-1px); }
+.tool-card.active { border-color: var(--gold); background: rgba(196,163,90,0.05); }
+.tool-icon { font-size: 22px; margin-bottom: 8px; }
+.tool-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.tool-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── AI OUTPUT ── */
+.ai-output-box {
+  background: var(--dark4); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  display: none;
+}
+.ai-output-box.show { display: block; animation: fadeIn 0.2s ease; }
+.ai-output-header {
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--border-dim);
+  margin-bottom: 1rem;
+}
+.ai-chip { background: rgba(196,163,90,0.15); color: var(--gold); font-size: 10px; letter-spacing: 0.07em; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; border: 1px solid rgba(196,163,90,0.3); }
+.ai-output-text { font-size: 13px; color: var(--text); line-height: 1.8; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+.ai-output-actions { display: flex; gap: 8px; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-dim); flex-wrap: wrap; }
+
+/* ── THINKING ANIMATION ── */
+.thinking { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 13px; }
+.dots { display: inline-flex; gap: 4px; }
+.dots span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: dot-pulse 1.4s ease-in-out infinite; }
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot-pulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+/* ── CASE ITEMS ── */
+.case-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border-dim); margin-bottom: 8px;
+  cursor: pointer; transition: all var(--transition);
+}
+.case-item:hover { border-color: var(--border); background: var(--dark4); }
+.case-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.case-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); min-width: 100px; }
+.case-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.case-area { font-size: 11px; color: var(--text-muted); }
+
+/* ── PRAZO ITEMS ── */
+.prazo-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radius);
+  border: 1px solid var(--border-dim); margin-bottom: 8px;
+}
+.prazo-counter {
+  min-width: 52px; height: 52px; border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.prazo-counter .num { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1; }
+.prazo-counter .lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.8; }
+.pc-critical { background: rgba(140,58,58,0.2); color: #E07070; border: 1px solid rgba(140,58,58,0.3); }
+.pc-urgent { background: rgba(184,123,42,0.2); color: #E09B4A; border: 1px solid rgba(184,123,42,0.3); }
+.pc-normal { background: rgba(74,140,92,0.15); color: #6BBF85; border: 1px solid rgba(74,140,92,0.3); }
+.prazo-info .prazo-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.prazo-info .prazo-sub { font-size: 11px; color: var(--text-muted); }
+
+/* ── INSIGHT CARDS ── */
+.insight-card {
+  border-left: 2px solid var(--gold); padding: 12px 14px;
+  background: rgba(196,163,90,0.04); border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 10px;
+}
+.insight-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.insight-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+/* ── PROGRESS BAR ── */
+.progress { background: var(--dark4); border-radius: 20px; height: 6px; overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 20px; background: var(--gold); transition: width 0.5s ease; }
+.progress-fill.success { background: #4A8C5C; }
+.progress-fill.warning { background: #B87B2A; }
+.progress-fill.danger { background: #8C3A3A; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 2rem;
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.15s ease; }
+.modal {
+  background: var(--dark3); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.75rem;
+  max-width: 580px; width: 100%; max-height: 85vh; overflow-y: auto;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--text); }
+.modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; }
+.modal-close:hover { color: var(--text); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border-dim); }
+
+/* ── TOAST ── */
+.toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--dark3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 10px;
+  animation: slideIn 0.2s ease; min-width: 260px;
+}
+.toast.success { border-color: rgba(74,140,92,0.5); }
+.toast.error { border-color: rgba(140,58,58,0.5); }
+@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1200px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .tool-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .sidebar { width: 200px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2-1 { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .tool-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── CHAT ── */
+.chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 120px); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 1rem 0; display: flex; flex-direction: column; gap: 16px; }
+.chat-msg { display: flex; gap: 12px; }
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.chat-avatar.ai { background: var(--gold); color: #0F0F0D; }
+.chat-avatar.user { background: var(--dark4); color: var(--text); border: 1px solid var(--border-dim); }
+.chat-bubble { max-width: 75%; background: var(--dark3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: var(--text); line-height: 1.7; }
+.chat-msg.user .chat-bubble { background: rgba(196,163,90,0.08); border-color: rgba(196,163,90,0.2); }
+.chat-input-wrap { display: flex; gap: 10px; padding-top: 1rem; border-top: 1px solid var(--border-dim); }
+.chat-input-wrap input { flex: 1; }
+
+/* ── ANALYTICS ── */
+.chart-bar-wrap { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding: 0 4px; }
+.chart-bar { flex: 1; border-radius: 4px 4px 0 0; position: relative; cursor: default; transition: opacity 0.2s; min-width: 0; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-bar-label { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 6px; }
+
+/* ── CALENDAR ── */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+.cal-day:hover { background: var(--dark4); color: var(--text); }
+.cal-day.today { background: rgba(196,163,90,0.15); color: var(--gold); font-weight: 500; }
+.cal-day.event { position: relative; color: var(--text); }
+.cal-day.event::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+.cal-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+.cal-wday { text-align: center; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 0; }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+.empty-state .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="logo-box"><span>L</span></div>
+        <div class="brand-text">
+          <div class="name">Ladisael</div>
+          <div class="sub">Advocacia · IA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">◈</span> Painel</div>
+      <div class="nav-item" onclick="showPage('cases',this)"><span class="icon">⚖</span> Processos <span class="badge-count">34</span></div>
+      <div class="nav-item" onclick="showPage('prazos',this)"><span class="icon">◷</span> Prazos <span class="badge-count">3</span></div>
+      <div class="nav-item" onclick="showPage('agenda',this)"><span class="icon">◻</span> Agenda</div>
+      <div class="nav-item" onclick="showPage('clientes',this)"><span class="icon">◎</span> Clientes</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">IA Jurídica</div>
+      <div class="nav-item" onclick="showPage('assistente',this)"><span class="icon">✦</span> Assistente IA</div>
+      <div class="nav-item" onclick="showPage('redacao',this)"><span class="icon">✐</span> Redação Jurídica</div>
+      <div class="nav-item" onclick="showPage('analise',this)"><span class="icon">◉</span> Análise & Resumos</div>
+      <div class="nav-item" onclick="showPage('argumentos',this)"><span class="icon">◈</span> Argumentos</div>
+      <div class="nav-item" onclick="showPage('pesquisa',this)"><span class="icon">⊕</span> Pesquisa Legal</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Gestão</div>
+      <div class="nav-item" onclick="showPage('analytics',this)"><span class="icon">◎</span> Analytics</div>
+      <div class="nav-item" onclick="showPage('financeiro',this)"><span class="icon">$</span> Financeiro</div>
+      <div class="nav-item" onclick="showPage('documentos',this)"><span class="icon">▣</span> Documentos</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">LA</div>
+        <div>
+          <div class="user-name">Dr. Ladisael</div>
+          <div class="user-role">Advogado Principal</div>
+        </div>
+      </div>
+      <div class="ai-status"><div class="ai-dot"></div> IA Conectada</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Painel</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('modal-case')">+ Novo Processo</button>
+        <button class="btn btn-primary btn-sm" onclick="showPage('assistente', null)">✦ Assistente IA</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══════════ DASHBOARD ═══════════ -->
+      <div id="page-dashboard" class="page active">
+        <div class="grid-4">
+          <div class="metric m-success">
+            <div class="metric-label">Processos Ativos</div>
+            <div class="metric-value">34</div>
+            <div class="metric-delta up">↑ +3 este mês</div>
+          </div>
+          <div class="metric m-warning">
+            <div class="metric-label">Audiências (30d)</div>
+            <div class="metric-value">8</div>
+            <div class="metric-delta">Próxima: 18/03</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Taxa de Êxito</div>
+            <div class="metric-value">79%</div>
+            <div class="metric-delta up">Acima da média OAB</div>
+          </div>
+          <div class="metric m-danger">
+            <div class="metric-label">Prazos Críticos</div>
+            <div class="metric-value">3</div>
+            <div class="metric-delta down">↓ Ação imediata</div>
+          </div>
+        </div>
+
+        <div class="grid-2-1">
+          <div>
+            <div class="section-title">Processos Recentes</div>
+            <div class="case-item"><div class="case-dot" style="background:#E07070"></div><span class="case-num">0045231-22.2024.8.26</span><span class="case-name">Silva & Herdeiros</span><span class="case-area">Inventário</span><span class="tag tag-danger" style="margin-left:auto">3 dias</span></div>
+            <div class="case-item"><div class="case-dot" style="background:#6BBF85"></div><span class="case-num">0012874-19.2024.5.02</span><span class="case-name">Construtora Lima Ltda</span><span class="case-area">Trabalhista</span><span class="tag tag-success" style="margin-left:auto">12 dias</span></div>
+            <div class="case-item"><div class="case-dot" style="background:#70A8E0"></div><span class="case-num">0099312-24.2024.8.26</span><span class="case-name">Maria Ferreira</span><span class="case-area">Consumidor</span><span class="tag tag-info" style="margin-left:auto">Novo</span></div>
+            <div class="case-item"><div class="case-dot" style="background:#E09B4A"></div><span class="case-num">0033100-21.2021.8.26</span><span class="case-name">João Mendes ME</span><span class="case-area">Empresarial</span><span class="tag tag-warning" style="margin-left:auto">7 dias</span></div>
+            <div class="case-item"><div class="case-dot" style="background:#6BBF85"></div><span class="case-num">0077541-23.2023.5.15</span><span class="case-name">Roberto Pinto</span><span class="case-area">Trabalhista</span><span class="tag tag-success" style="margin-left:auto">25 dias</span></div>
+          </div>
+
+          <div>
+            <div class="section-title">Insights IA</div>
+            <div class="insight-card">
+              <div class="insight-title">Tendência: Direito do Consumidor</div>
+              <div class="insight-text">38% dos novos casos são de CDC. Taxa de êxito: 84% no TJSP.</div>
+            </div>
+            <div class="insight-card" style="border-color:#E09B4A; background: rgba(184,123,42,0.05);">
+              <div class="insight-title">⚠ Jurisprudência atualizada</div>
+              <div class="insight-text">STJ REsp 2.105.441 altera partilha de bens digitais.</div>
+            </div>
+            <div class="insight-card" style="margin-top:1rem">
+              <div class="section-title" style="font-size:13px">Êxito por Área</div>
+              <div style="margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Trabalhista</span><span>82%</span></div>
+                <div class="progress"><div class="progress-fill success" style="width:82%"></div></div>
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Consumidor</span><span>84%</span></div>
+                <div class="progress"><div class="progress-fill success" style="width:84%"></div></div>
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Cível</span><span>71%</span></div>
+                <div class="progress"><div class="progress-fill" style="width:71%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Empresarial</span><span>68%</span></div>
+                <div class="progress"><div class="progress-fill warning" style="width:68%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ PROCESSOS ═══════════ -->
+      <div id="page-cases" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:1.25rem;align-items:center">
+          <input type="search" placeholder="Buscar por número, cliente ou área..." style="flex:1">
+          <select style="width:160px">
+            <option>Todas as áreas</option>
+            <option>Trabalhista</option>
+            <option>Cível</option>
+            <option>Consumidor</option>
+            <option>Empresarial</option>
+            <option>Família</option>
+            <option>Inventário</option>
+          </select>
+          <select style="width:140px">
+            <option>Todos status</option>
+            <option>Ativo</option>
+            <option>Urgente</option>
+            <option>Encerrado</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-case')">+ Novo</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Processo</th><th>Cliente</th><th>Área</th><th>Fase</th><th>Prazo</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td class="td-mono">0045231-22.2024.8.26</td><td>Silva &amp; Herdeiros</td><td>Inventário</td><td>Contestação</td><td style="color:#E07070">2 dias</td><td><span class="tag tag-danger">Urgente</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0012874-19.2024.5.02</td><td>Construtora Lima</td><td>Trabalhista</td><td>Recurso</td><td>12 dias</td><td><span class="tag tag-success">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0099312-24.2024.8.26</td><td>Maria Ferreira</td><td>Consumidor</td><td>Distribuição</td><td>—</td><td><span class="tag tag-info">Novo</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0033100-21.2021.8.26</td><td>João Mendes ME</td><td>Empresarial</td><td>Instrução</td><td style="color:#E09B4A">7 dias</td><td><span class="tag tag-warning">Atenção</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0077541-23.2023.5.15</td><td>Roberto Pinto</td><td>Trabalhista</td><td>Audiência</td><td>25 dias</td><td><span class="tag tag-success">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0011234-20.2020.8.26</td><td>Ana Costa</td><td>Família</td><td>Acordo</td><td>18 dias</td><td><span class="tag tag-success">Ativo</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+              <tr><td class="td-mono">0065432-18.2018.8.26</td><td>Tech Solutions</td><td>Empresarial</td><td>Execução</td><td>—</td><td><span class="tag tag-gold">Encerrado</span></td><td><button class="btn btn-ghost btn-sm" onclick="showPage('assistente',null)">IA ↗</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ PRAZOS ═══════════ -->
+      <div id="page-prazos" class="page">
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Prazos Críticos</div>
+            <div class="prazo-item"><div class="prazo-counter pc-critical"><span class="num">2</span><span class="lbl">dias</span></div><div class="prazo-info"><div class="prazo-name">Contestação — Silva &amp; Herdeiros</div><div class="prazo-sub">Proc. 0045231-22 · 3ª Vara Cível SP · Juiz Dr. Marcos</div></div><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="showPage('redacao',null)">Redigir</button></div>
+            <div class="prazo-item"><div class="prazo-counter pc-urgent"><span class="num">7</span><span class="lbl">dias</span></div><div class="prazo-info"><div class="prazo-name">Recurso de Apelação — Lima Const.</div><div class="prazo-sub">Proc. 0012874-19 · TRT 2ª Região</div></div><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="showPage('redacao',null)">Redigir</button></div>
+            <div class="prazo-item"><div class="prazo-counter pc-urgent"><span class="num">9</span><span class="lbl">dias</span></div><div class="prazo-info"><div class="prazo-name">Manifestação — Mendes ME</div><div class="prazo-sub">Proc. 0033100-21 · 1ª Vara Empresarial</div></div><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="showPage('redacao',null)">Redigir</button></div>
+            <div class="section-title" style="margin-top:1.5rem">Prazos Normais</div>
+            <div class="prazo-item"><div class="prazo-counter pc-normal"><span class="num">18</span><span class="lbl">dias</span></div><div class="prazo-info"><div class="prazo-name">Réplica — Maria Ferreira</div><div class="prazo-sub">Proc. 0099312-24 · Juizado Especial</div></div></div>
+            <div class="prazo-item"><div class="prazo-counter pc-normal"><span class="num">25</span><span class="lbl">dias</span></div><div class="prazo-info"><div class="prazo-name">Audiência Instrução — R. Pinto</div><div class="prazo-sub">Proc. 0077541-23 · 5ª Vara Trabalhista</div></div></div>
+          </div>
+          <div>
+            <div class="section-title">Agenda do Mês</div>
+            <div class="card card-gold">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+                <div style="font-family:'Playfair Display',serif;font-size:14px">Março 2025</div>
+                <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm btn-icon">‹</button><button class="btn btn-ghost btn-sm btn-icon">›</button></div>
+              </div>
+              <div class="cal-header">
+                <div class="cal-wday">Dom</div><div class="cal-wday">Seg</div><div class="cal-wday">Ter</div><div class="cal-wday">Qua</div><div class="cal-wday">Qui</div><div class="cal-wday">Sex</div><div class="cal-wday">Sáb</div>
+              </div>
+              <div class="cal-grid" id="calendar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ CLIENTES ═══════════ -->
+      <div id="page-clientes" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:1.25rem">
+          <input type="search" placeholder="Buscar cliente..." style="flex:1">
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-client')">+ Novo Cliente</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Tipo</th><th>Processos</th><th>Contato</th><th>Honorários</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Silva &amp; Herdeiros</strong></td><td><span class="tag tag-info">Família</span></td><td>2</td><td>silva@email.com</td><td>R$ 8.500</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+              <tr><td><strong>Construtora Lima Ltda</strong></td><td><span class="tag tag-gold">PJ</span></td><td>3</td><td>(11) 99999-1234</td><td>R$ 22.000</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+              <tr><td><strong>Maria Ferreira</strong></td><td><span class="tag tag-success">PF</span></td><td>1</td><td>maria@email.com</td><td>R$ 3.200</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+              <tr><td><strong>João Mendes ME</strong></td><td><span class="tag tag-gold">PJ</span></td><td>1</td><td>(11) 98888-5678</td><td>R$ 12.000</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+              <tr><td><strong>Roberto Pinto</strong></td><td><span class="tag tag-success">PF</span></td><td>1</td><td>roberto@email.com</td><td>R$ 5.500</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+              <tr><td><strong>Ana Costa</strong></td><td><span class="tag tag-success">PF</span></td><td>2</td><td>ana@email.com</td><td>R$ 7.800</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ ASSISTENTE IA ═══════════ -->
+      <div id="page-assistente" class="page">
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg">
+              <div class="chat-avatar ai">L</div>
+              <div class="chat-bubble"><strong>Olá, Dr. Ladisael.</strong><br>Sou seu assistente jurídico com IA. Posso ajudar com análise de casos, redigir peças processuais, criar argumentos, resumir documentos, pesquisar jurisprudência e muito mais.<br><br>Como posso auxiliar hoje?</div>
+            </div>
+          </div>
+          <div class="chat-input-wrap">
+            <input type="text" id="chat-input" placeholder="Faça uma pergunta jurídica ou descreva um caso..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="btn btn-primary" onclick="sendChat()">Enviar →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ REDAÇÃO JURÍDICA ═══════════ -->
+      <div id="page-redacao" class="page">
+        <div class="tool-grid">
+          <div class="tool-card active" onclick="selectTool(this,'peticao')"><div class="tool-icon">📄</div><div class="tool-name">Petição Inicial</div><div class="tool-desc">Redija petições iniciais fundamentadas e completas</div></div>
+          <div class="tool-card" onclick="selectTool(this,'contestacao')"><div class="tool-icon">🛡️</div><div class="tool-name">Contestação</div><div class="tool-desc">Defesa completa com preliminares e mérito</div></div>
+          <div class="tool-card" onclick="selectTool(this,'recurso')"><div class="tool-icon">⚖️</div><div class="tool-name">Recurso / Apelação</div><div class="tool-desc">Razões recursais e contrarrazões</div></div>
+          <div class="tool-card" onclick="selectTool(this,'contrato')"><div class="tool-icon">✍️</div><div class="tool-name">Contratos</div><div class="tool-desc">Elaboração e revisão de contratos</div></div>
+          <div class="tool-card" onclick="selectTool(this,'notificacao')"><div class="tool-icon">📬</div><div class="tool-name">Notificação Extrajudicial</div><div class="tool-desc">Notificações e interpelações formais</div></div>
+          <div class="tool-card" onclick="selectTool(this,'parecer')"><div class="tool-icon">🔍</div><div class="tool-name">Parecer Jurídico</div><div class="tool-desc">Pareceres técnicos fundamentados</div></div>
+          <div class="tool-card" onclick="selectTool(this,'acordo')"><div class="tool-icon">🤝</div><div class="tool-name">Acordo / Transação</div><div class="tool-desc">Minutas de acordo e transação judicial</div></div>
+          <div class="tool-card" onclick="selectTool(this,'habeas')"><div class="tool-icon">🔓</div><div class="tool-name">Habeas Corpus / Mandado</div><div class="tool-desc">Remédios constitucionais urgentes</div></div>
+          <div class="tool-card" onclick="selectTool(this,'embargo')"><div class="tool-icon">📋</div><div class="tool-name">Embargos / Impugnação</div><div class="tool-desc">Embargos de declaração e execução</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Tipo de ação / tribunal</label>
+              <input type="text" id="red-tipo" placeholder="Ex: Ação de cobrança · TJSP 3ª Vara Cível">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Partes do processo</label>
+              <input type="text" id="red-partes" placeholder="Ex: Autor: João Silva · Réu: Empresa ABC Ltda">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fatos e contexto</label>
+              <textarea id="red-fatos" rows="5" placeholder="Descreva os fatos relevantes, datas, valores, provas disponíveis..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pedidos / tese defensiva</label>
+              <textarea id="red-pedidos" rows="3" placeholder="Descreva os pedidos ou a tese de defesa..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="runRedacao()">✦ Gerar com IA</button>
+          </div>
+          <div>
+            <div class="ai-output-box show" id="red-output">
+              <div class="ai-output-header">
+                <div class="ai-chip">Ladisael IA</div>
+                <span style="font-size:12px;color:var(--text-muted)" id="red-type-label">Petição Inicial</span>
+              </div>
+              <div class="ai-output-text" id="red-output-text" style="color:var(--text-dim);font-style:italic">Preencha os campos ao lado e clique em "Gerar com IA" para redigir automaticamente sua peça processual com fundamentação jurídica completa.</div>
+              <div class="ai-output-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copyOutput('red-output-text')">Copiar</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadText('red-output-text','peca-juridica.txt')">Baixar .txt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ANÁLISE & RESUMOS ═══════════ -->
+      <div id="page-analise" class="page">
+        <div class="tool-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="tool-card active" onclick="selectAnalise(this,'resumo_proc')"><div class="tool-icon">📑</div><div class="tool-name">Resumo de Processo</div><div class="tool-desc">Síntese executiva do caso</div></div>
+          <div class="tool-card" onclick="selectAnalise(this,'resumo_doc')"><div class="tool-icon">📃</div><div class="tool-name">Resumo de Documento</div><div class="tool-desc">Análise de contratos e peças</div></div>
+          <div class="tool-card" onclick="selectAnalise(this,'risco')"><div class="tool-icon">⚠️</div><div class="tool-name">Análise de Risco</div><div class="tool-desc">Probabilidade de êxito</div></div>
+          <div class="tool-card" onclick="selectAnalise(this,'clausulas')"><div class="tool-icon">🔎</div><div class="tool-name">Cláusulas Abusivas</div><div class="tool-desc">Detecção em contratos</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Cole aqui o texto para análise</label>
+              <textarea id="analise-input" rows="12" placeholder="Cole o texto do processo, contrato ou documento que deseja analisar..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Foco da análise (opcional)</label>
+              <input type="text" id="analise-foco" placeholder="Ex: cláusula de multa, prazo prescricional, responsabilidade...">
+            </div>
+            <button class="btn btn-primary" onclick="runAnalise()">✦ Analisar com IA</button>
+          </div>
+          <div>
+            <div class="ai-output-box show" id="analise-output">
+              <div class="ai-output-header">
+                <div class="ai-chip">Análise IA</div>
+                <span style="font-size:12px;color:var(--text-muted)" id="analise-type-label">Resumo de Processo</span>
+              </div>
+              <div class="ai-output-text" id="analise-output-text" style="color:var(--text-dim);font-style:italic">Cole um texto ao lado e clique em "Analisar com IA" para obter resumos, análise de risco ou identificação de cláusulas problemáticas.</div>
+              <div class="ai-output-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copyOutput('analise-output-text')">Copiar</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadText('analise-output-text','analise.txt')">Baixar .txt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ARGUMENTOS ═══════════ -->
+      <div id="page-argumentos" class="page">
+        <div class="tool-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="tool-card active" onclick="selectArg(this,'favoraveis')"><div class="tool-icon">✅</div><div class="tool-name">Argumentos Favoráveis</div><div class="tool-desc">Teses e fundamentos a favor</div></div>
+          <div class="tool-card" onclick="selectArg(this,'contra')"><div class="tool-icon">⚔️</div><div class="tool-name">Contra-argumentos</div><div class="tool-desc">Antecipe a tese adversa</div></div>
+          <div class="tool-card" onclick="selectArg(this,'jurisprudencia')"><div class="tool-icon">📚</div><div class="tool-name">Jurisprudência Aplicável</div><div class="tool-desc">STF, STJ, TRTs e TJs</div></div>
+          <div class="tool-card" onclick="selectArg(this,'preliminares')"><div class="tool-icon">🚧</div><div class="tool-name">Preliminares Processuais</div><div class="tool-desc">Extinção sem mérito, decadência, etc.</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Área do Direito</label>
+              <select id="arg-area">
+                <option>Direito do Trabalho</option>
+                <option>Direito Civil</option>
+                <option>Direito do Consumidor</option>
+                <option>Direito Empresarial</option>
+                <option>Direito de Família</option>
+                <option>Direito Tributário</option>
+                <option>Direito Penal</option>
+                <option>Direito Administrativo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Posição (Autor ou Réu)</label>
+              <select id="arg-posicao">
+                <option>Representando o Autor / Reclamante</option>
+                <option>Representando o Réu / Reclamado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descreva o caso e a controvérsia central</label>
+              <textarea id="arg-caso" rows="6" placeholder="Descreva os fatos, a controvérsia jurídica e o que precisa ser provado..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="runArgumentos()">✦ Gerar Argumentos</button>
+          </div>
+          <div>
+            <div class="ai-output-box show" id="arg-output">
+              <div class="ai-output-header">
+                <div class="ai-chip">Argumentos IA</div>
+                <span style="font-size:12px;color:var(--text-muted)" id="arg-type-label">Favoráveis</span>
+              </div>
+              <div class="ai-output-text" id="arg-output-text" style="color:var(--text-dim);font-style:italic">Preencha as informações do caso ao lado para gerar argumentos jurídicos estratégicos, fundamentados em lei e jurisprudência.</div>
+              <div class="ai-output-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copyOutput('arg-output-text')">Copiar</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadText('arg-output-text','argumentos.txt')">Baixar .txt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ PESQUISA LEGAL ═══════════ -->
+      <div id="page-pesquisa" class="page">
+        <div class="tool-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="tool-card active" onclick="selectPesquisa(this,'jurisprudencia_stj')"><div class="tool-icon">🏛️</div><div class="tool-name">STJ / STF</div><div class="tool-desc">Súmulas e julgados superiores</div></div>
+          <div class="tool-card" onclick="selectPesquisa(this,'legislacao')"><div class="tool-icon">📜</div><div class="tool-name">Legislação</div><div class="tool-desc">Normas e regulamentos vigentes</div></div>
+          <div class="tool-card" onclick="selectPesquisa(this,'doutrina')"><div class="tool-icon">📖</div><div class="tool-name">Doutrina</div><div class="tool-desc">Posição dos principais autores</div></div>
+          <div class="tool-card" onclick="selectPesquisa(this,'prazo_prescricao')"><div class="tool-icon">⏳</div><div class="tool-name">Prazos &amp; Prescrição</div><div class="tool-desc">Decadência e prescrição</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Tema de pesquisa</label>
+              <textarea id="pesquisa-input" rows="5" placeholder="Ex: Responsabilidade do empregador por acidente de trabalho com terceirizado. Quais são os principais julgados do TST sobre o tema?"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tribunal / jurisdição de interesse</label>
+              <input type="text" id="pesquisa-tribunal" placeholder="Ex: TST, TRT 2ª Região, TJSP, STJ...">
+            </div>
+            <button class="btn btn-primary" onclick="runPesquisa()">✦ Pesquisar com IA</button>
+          </div>
+          <div>
+            <div class="ai-output-box show" id="pesquisa-output">
+              <div class="ai-output-header">
+                <div class="ai-chip">Pesquisa IA</div>
+                <span style="font-size:12px;color:var(--text-muted)" id="pesquisa-type-label">Jurisprudência STJ/STF</span>
+              </div>
+              <div class="ai-output-text" id="pesquisa-output-text" style="color:var(--text-dim);font-style:italic">Digite seu tema de pesquisa jurídica ao lado. A IA irá apresentar jurisprudência, súmulas, doutrina e legislação relevante.</div>
+              <div class="ai-output-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copyOutput('pesquisa-output-text')">Copiar</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadText('pesquisa-output-text','pesquisa-juridica.txt')">Baixar .txt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ANALYTICS ═══════════ -->
+      <div id="page-analytics" class="page">
+        <div class="grid-4">
+          <div class="metric"><div class="metric-label">Faturamento (mês)</div><div class="metric-value">R$ 48k</div><div class="metric-delta up">↑ +12% vs. mês ant.</div></div>
+          <div class="metric m-success"><div class="metric-label">Causas ganhas (2024)</div><div class="metric-value">67</div><div class="metric-delta up">79% de êxito</div></div>
+          <div class="metric m-warning"><div class="metric-label">Em andamento</div><div class="metric-value">34</div><div class="metric-delta">Média: 14 meses</div></div>
+          <div class="metric"><div class="metric-label">Honorários a receber</div><div class="metric-value">R$ 127k</div><div class="metric-delta">12 contratos ativos</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card-gold">
+            <div class="card-title" style="margin-bottom:1rem">Novos processos por mês</div>
+            <div id="chart-bar" class="chart-bar-wrap"></div>
+            <div id="chart-labels" style="display:flex;gap:8px;padding:0 4px"></div>
+          </div>
+          <div class="card card-gold">
+            <div class="card-title" style="margin-bottom:1rem">Distribuição por área</div>
+            <div id="chart-area"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:1rem">Honorários recebidos (2024)</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Mês</th><th>Recebido</th><th>Meta</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr><td>Jan</td><td>R$ 38.200</td><td>R$ 40.000</td><td><span class="tag tag-warning">95%</span></td></tr>
+                  <tr><td>Fev</td><td>R$ 44.500</td><td>R$ 40.000</td><td><span class="tag tag-success">111%</span></td></tr>
+                  <tr><td>Mar</td><td>R$ 48.000</td><td>R$ 45.000</td><td><span class="tag tag-success">107%</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:1rem">Previsão IA para próximos 3 meses</div>
+            <div class="insight-card"><div class="insight-title">Abril 2025</div><div class="insight-text">Projeção: R$ 51.000 — 3 novos casos esperados com base no histórico.</div></div>
+            <div class="insight-card"><div class="insight-title">Maio 2025</div><div class="insight-text">Projeção: R$ 55.000 — Alta em demandas trabalhistas (sazonalidade).</div></div>
+            <div class="insight-card"><div class="insight-title">Junho 2025</div><div class="insight-text">Projeção: R$ 49.000 — Período de férias reduz atividade judicial.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ FINANCEIRO ═══════════ -->
+      <div id="page-financeiro" class="page">
+        <div class="grid-4">
+          <div class="metric m-success"><div class="metric-label">Receita Total (ano)</div><div class="metric-value">R$ 392k</div><div class="metric-delta up">↑ +18% vs. 2023</div></div>
+          <div class="metric m-danger"><div class="metric-label">Inadimplência</div><div class="metric-value">R$ 28k</div><div class="metric-delta down">8 clientes em atraso</div></div>
+          <div class="metric"><div class="metric-label">Honorários a receber</div><div class="metric-value">R$ 127k</div><div class="metric-delta">Próximos 60 dias</div></div>
+          <div class="metric m-warning"><div class="metric-label">Êxito a receber</div><div class="metric-value">R$ 89k</div><div class="metric-delta">Contingente (ganhos)</div></div>
+        </div>
+        <div class="section-title">Honorários por Cliente</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>Contrato</th><th>Valor</th><th>Recebido</th><th>Pendente</th><th>Vencimento</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Construtora Lima</td><td>Mensal + Êxito</td><td>R$ 22.000</td><td>R$ 18.000</td><td>R$ 4.000</td><td>30/03/2025</td><td><span class="tag tag-warning">Parcial</span></td></tr>
+              <tr><td>João Mendes ME</td><td>Fixo</td><td>R$ 12.000</td><td>R$ 12.000</td><td>—</td><td>—</td><td><span class="tag tag-success">Pago</span></td></tr>
+              <tr><td>Ana Costa</td><td>Êxito 20%</td><td>R$ 7.800</td><td>—</td><td>R$ 7.800</td><td>Êxito</td><td><span class="tag tag-info">Contingente</span></td></tr>
+              <tr><td>Silva &amp; Herdeiros</td><td>Fixo + Êxito</td><td>R$ 8.500</td><td>R$ 4.000</td><td>R$ 4.500</td><td>15/03/2025</td><td><span class="tag tag-danger">Vencido</span></td></tr>
+              <tr><td>Maria Ferreira</td><td>Fixo</td><td>R$ 3.200</td><td>R$ 1.600</td><td>R$ 1.600</td><td>01/04/2025</td><td><span class="tag tag-success">Em dia</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ DOCUMENTOS ═══════════ -->
+      <div id="page-documentos" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:1.25rem">
+          <input type="search" placeholder="Buscar documento..." style="flex:1">
+          <select style="width:160px">
+            <option>Todos os tipos</option>
+            <option>Petição</option>
+            <option>Contestação</option>
+            <option>Recurso</option>
+            <option>Contrato</option>
+            <option>Parecer</option>
+          </select>
+          <button class="btn btn-primary btn-sm">+ Novo Documento</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Documento</th><th>Processo</th><th>Tipo</th><th>Gerado por</th><th>Data</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr><td>Petição Inicial — Silva</td><td class="td-mono">0045231-22</td><td><span class="tag tag-gold">Petição</span></td><td>IA + Dr. Ladisael</td><td>10/03/2025</td><td><button class="btn btn-ghost btn-sm">Ver</button> <button class="btn btn-ghost btn-sm">Baixar</button></td></tr>
+              <tr><td>Recurso Ordinário — Lima</td><td class="td-mono">0012874-19</td><td><span class="tag tag-info">Recurso</span></td><td>IA + Dr. Ladisael</td><td>08/03/2025</td><td><button class="btn btn-ghost btn-sm">Ver</button> <button class="btn btn-ghost btn-sm">Baixar</button></td></tr>
+              <tr><td>Contestação — Mendes ME</td><td class="td-mono">0033100-21</td><td><span class="tag tag-warning">Contestação</span></td><td>Dr. Ladisael</td><td>05/03/2025</td><td><button class="btn btn-ghost btn-sm">Ver</button> <button class="btn btn-ghost btn-sm">Baixar</button></td></tr>
+              <tr><td>Parecer — Direito Digital</td><td>—</td><td><span class="tag tag-success">Parecer</span></td><td>IA + Dr. Ladisael</td><td>01/03/2025</td><td><button class="btn btn-ghost btn-sm">Ver</button> <button class="btn btn-ghost btn-sm">Baixar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ AGENDA ═══════════ -->
+      <div id="page-agenda" class="page">
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Próximos Compromissos</div>
+            <div class="case-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px;width:100%">
+                <div style="background:rgba(196,163,90,0.15);color:var(--gold);font-family:'Playfair Display',serif;font-size:18px;min-width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(196,163,90,0.3)">18</div>
+                <div><div style="font-size:13px;font-weight:500">Audiência Instrução — Roberto Pinto</div><div style="font-size:11px;color:var(--text-muted)">09:00h · 5ª Vara Trabalhista · Proc. 0077541-23</div></div>
+                <span class="tag tag-danger" style="margin-left:auto">Confirmada</span>
+              </div>
+            </div>
+            <div class="case-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px;width:100%">
+                <div style="background:var(--dark4);color:var(--text);font-family:'Playfair Display',serif;font-size:18px;min-width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-dim)">22</div>
+                <div><div style="font-size:13px;font-weight:500">Reunião — Construtora Lima</div><div style="font-size:11px;color:var(--text-muted)">14:00h · Escritório · Estratégia recursal</div></div>
+                <span class="tag tag-warning" style="margin-left:auto">Confirmada</span>
+              </div>
+            </div>
+            <div class="case-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px;width:100%">
+                <div style="background:var(--dark4);color:var(--text);font-family:'Playfair Display',serif;font-size:18px;min-width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-dim)">25</div>
+                <div><div style="font-size:13px;font-weight:500">Conciliação — Maria Ferreira</div><div style="font-size:11px;color:var(--text-muted)">10:30h · Juizado Especial · Virtual</div></div>
+                <span class="tag tag-info" style="margin-left:auto">Aguardando</span>
+              </div>
+            </div>
+            <div class="case-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px;width:100%">
+                <div style="background:var(--dark4);color:var(--text);font-family:'Playfair Display',serif;font-size:18px;min-width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-dim)">28</div>
+                <div><div style="font-size:13px;font-weight:500">Perícia — Silva &amp; Herdeiros</div><div style="font-size:11px;color:var(--text-muted)">15:00h · Cartório 3ª Vara · Inventário</div></div>
+                <span class="tag tag-gold" style="margin-left:auto">Designada</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">Sugestões IA para esta semana</div>
+            <div class="insight-card"><div class="insight-title">Preparar para audiência dia 18</div><div class="insight-text">Com base nos autos, a IA sugere focar nos depoimentos de 2 testemunhas sobre horas extras. Juntada de cartões de ponto pode fortalecer a tese.</div></div>
+            <div class="insight-card" style="border-color:#E09B4A;background:rgba(184,123,42,0.05)"><div class="insight-title">Protocolar contestação até dia 16</div><div class="insight-text">O prazo do processo 0045231-22 vence em 2 dias. A IA já tem o esboço da contestação pronto para revisão na aba Redação.</div></div>
+            <div class="insight-card"><div class="insight-title">Oportunidade de acordo — Mendes ME</div><div class="insight-text">Análise preditiva indica 70% de chance de acordo favorável neste momento processual. Sugerimos proposta de R$ 35.000 com parcelamento.</div></div>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="showPage('redacao',null)">✦ Preparar peças para semana →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="modal-overlay" id="modal-case">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Processo</div>
+      <button class="modal-close" onclick="closeModal('modal-case')">✕</button>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Número do processo</label><input type="text" placeholder="0000000-00.0000.0.00.0000"></div>
+      <div class="form-group"><label class="form-label">Área do direito</label><select><option>Trabalhista</option><option>Cível</option><option>Consumidor</option><option>Empresarial</option><option>Família</option><option>Inventário</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Cliente</label><input type="text" placeholder="Nome do cliente ou empresa"></div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Parte contrária</label><input type="text" placeholder="Nome ou razão social"></div>
+      <div class="form-group"><label class="form-label">Tribunal / Vara</label><input type="text" placeholder="Ex: TJSP 3ª Vara Cível"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição / Fatos</label><textarea rows="3" placeholder="Resumo do caso..."></textarea></div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Valor da causa</label><input type="text" placeholder="R$ 0,00"></div>
+      <div class="form-group"><label class="form-label">Primeiro prazo</label><input type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-case')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-case');showToast('Processo cadastrado com sucesso!','success')">Cadastrar Processo</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Cliente</div>
+      <button class="modal-close" onclick="closeModal('modal-client')">✕</button>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Nome completo / Razão social</label><input type="text" placeholder="Nome do cliente"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select><option>Pessoa Física</option><option>Pessoa Jurídica</option></select></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">CPF / CNPJ</label><input type="text" placeholder="000.000.000-00"></div>
+      <div class="form-group"><label class="form-label">Telefone</label><input type="text" placeholder="(00) 00000-0000"></div>
+    </div>
+    <div class="form-group"><label class="form-label">E-mail</label><input type="email" placeholder="cliente@email.com"></div>
+    <div class="form-group"><label class="form-label">Endereço</label><input type="text" placeholder="Rua, número, cidade, estado"></div>
+    <div class="form-group"><label class="form-label">Observações</label><textarea rows="2" placeholder="Informações adicionais..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-client')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-client');showToast('Cliente cadastrado!','success')">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+/* ──────────── NAVIGATION ──────────── */
+const pageTitles = {
+  dashboard:'Painel',cases:'Processos',prazos:'Prazos & Audiências',agenda:'Agenda',
+  clientes:'Clientes',assistente:'Assistente IA',redacao:'Redação Jurídica',
+  analise:'Análise & Resumos',argumentos:'Gerador de Argumentos',pesquisa:'Pesquisa Legal',
+  analytics:'Analytics',financeiro:'Financeiro',documentos:'Documentos'
+};
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[id]||id;
+  if(el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.onclick&&n.onclick.toString().includes("'"+id+"'")) n.classList.add('active');
+    });
+  }
+  if(id==='analytics') buildCharts();
+  if(id==='prazos') buildCalendar();
+}
+
+/* ──────────── MODAL ──────────── */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+/* ──────────── TOAST ──────────── */
+function showToast(msg, type=''){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='toast '+(type||'');
+  t.innerHTML=(type==='success'?'✓ ':type==='error'?'✕ ':'')+msg;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+
+/* ──────────── TOOL SELECTION ──────────── */
+const toolLabels = {
+  peticao:'Petição Inicial',contestacao:'Contestação',recurso:'Recurso / Apelação',
+  contrato:'Contrato',notificacao:'Notificação Extrajudicial',parecer:'Parecer Jurídico',
+  acordo:'Acordo / Transação',habeas:'Habeas Corpus / Mandado de Segurança',embargo:'Embargos'
+};
+let currentTool='peticao';
+function selectTool(el, type){
+  document.querySelectorAll('#page-redacao .tool-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); currentTool=type;
+  document.getElementById('red-type-label').textContent=toolLabels[type]||type;
+}
+
+const analiseLabels={resumo_proc:'Resumo de Processo',resumo_doc:'Resumo de Documento',risco:'Análise de Risco',clausulas:'Cláusulas Abusivas'};
+let currentAnalise='resumo_proc';
+function selectAnalise(el,type){
+  document.querySelectorAll('#page-analise .tool-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); currentAnalise=type;
+  document.getElementById('analise-type-label').textContent=analiseLabels[type]||type;
+}
+
+const argLabels={favoraveis:'Argumentos Favoráveis',contra:'Contra-argumentos',jurisprudencia:'Jurisprudência',preliminares:'Preliminares Processuais'};
+let currentArg='favoraveis';
+function selectArg(el,type){
+  document.querySelectorAll('#page-argumentos .tool-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); currentArg=type;
+  document.getElementById('arg-type-label').textContent=argLabels[type]||type;
+}
+
+const pesquisaLabels={jurisprudencia_stj:'STJ / STF',legislacao:'Legislação',doutrina:'Doutrina',prazo_prescricao:'Prazos & Prescrição'};
+let currentPesquisa='jurisprudencia_stj';
+function selectPesquisa(el,type){
+  document.querySelectorAll('#page-pesquisa .tool-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); currentPesquisa=type;
+  document.getElementById('pesquisa-type-label').textContent=pesquisaLabels[type]||type;
+}
+
+/* ──────────── ANTHROPIC API CALL ──────────── */
+async function callAI(systemPrompt, userMessage, outputId) {
+  const el = document.getElementById(outputId);
+  el.innerHTML = '<div class="thinking"><div class="dots"><span></span><span></span><span></span></div> Analisando com IA jurídica...</div>';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:'user', content: userMessage}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c=>c.text||'').join('')||'Não foi possível gerar a resposta.';
+    el.textContent = text;
+    return text;
+  } catch(e) {
+    el.textContent = 'Erro ao conectar com a IA. Verifique sua conexão.';
+  }
+}
+
+const SYSTEM_JURIDICO = `Você é um advogado sênior altamente qualificado do escritório Ladisael Advocacia, com mais de 20 anos de experiência no direito brasileiro. Seus textos são precisos, formais, técnicos e fundamentados na legislação e jurisprudência vigente. Responda sempre em português, de forma profissional. Máximo 600 palavras por resposta, mas seja completo e útil.`;
+
+/* ──────────── REDAÇÃO ──────────── */
+async function runRedacao(){
+  const tipo=document.getElementById('red-tipo').value;
+  const partes=document.getElementById('red-partes').value;
+  const fatos=document.getElementById('red-fatos').value;
+  const pedidos=document.getElementById('red-pedidos').value;
+  if(!fatos.trim()){ showToast('Descreva os fatos do caso.','error'); return; }
+  const prompts = {
+    peticao:`Redija uma petição inicial completa com: qualificação das partes, dos fatos, fundamentação jurídica (artigos de lei e jurisprudência) e pedidos. Tipo de ação: ${tipo}. Partes: ${partes}. Fatos: ${fatos}. Pedidos: ${pedidos}.`,
+    contestacao:`Redija uma contestação completa com preliminares (se cabíveis), mérito e pedido de improcedência. Tipo: ${tipo}. Partes: ${partes}. Fatos: ${fatos}. Tese defensiva: ${pedidos}.`,
+    recurso:`Redija as razões de recurso/apelação, com síntese da decisão recorrida, fundamentos do recurso (error in procedendo e/ou error in judicando), jurisprudência favorável e pedido de reforma. Ação: ${tipo}. Partes: ${partes}. Fatos: ${fatos}. Fundamentos: ${pedidos}.`,
+    contrato:`Elabore as cláusulas principais do contrato solicitado, com cláusula de objeto, obrigações das partes, prazo, valor, rescisão e foro. Tipo de contrato: ${tipo}. Partes: ${partes}. Condições: ${fatos}. Especificidades: ${pedidos}.`,
+    notificacao:`Redija uma notificação extrajudicial formal com qualificação do notificante e notificado, fatos que motivam a notificação, fundamento legal e prazo para resposta. Situação: ${fatos}. Partes: ${partes}. Exigência: ${pedidos}.`,
+    parecer:`Elabore um parecer jurídico com: ementa, relatório dos fatos, análise jurídica fundamentada (legislação + jurisprudência) e conclusão. Questão: ${fatos}. Contexto: ${partes}. Foco: ${pedidos}.`,
+    acordo:`Redija a minuta de um acordo/transação judicial com: qualificação das partes, objeto do acordo, obrigações, forma de pagamento, cláusula de quitação e foro. Contexto: ${fatos}. Partes: ${partes}. Termos: ${pedidos}.`,
+    habeas:`Redija o instrumento constitucional cabível (habeas corpus ou mandado de segurança) com autoridade coatora, ato impugnado, fundamentos constitucionais e pedido liminar. Situação: ${fatos}. Partes: ${partes}. Pedido: ${pedidos}.`,
+    embargo:`Redija embargos de declaração / impugnação com indicação dos pontos omissos ou contraditórios, fundamentação e pedido de acolhimento. Decisão embargada: ${fatos}. Partes: ${partes}. Pontos: ${pedidos}.`
+  };
+  await callAI(SYSTEM_JURIDICO, prompts[currentTool]||prompts.peticao, 'red-output-text');
+  showToast('Peça gerada com sucesso!','success');
+}
+
+/* ──────────── ANÁLISE ──────────── */
+async function runAnalise(){
+  const texto=document.getElementById('analise-input').value;
+  const foco=document.getElementById('analise-foco').value;
+  if(!texto.trim()){ showToast('Cole um texto para análise.','error'); return; }
+  const prompts = {
+    resumo_proc:`Faça um resumo executivo deste processo/documento jurídico em formato estruturado: 1) Partes envolvidas, 2) Objeto da ação, 3) Estado atual, 4) Pontos críticos, 5) Próximos passos recomendados. ${foco?'Foco especial em: '+foco+'.':''}\n\nTexto:\n${texto}`,
+    resumo_doc:`Analise este documento jurídico e forneça: 1) Tipo e natureza do documento, 2) Principais obrigações de cada parte, 3) Prazos e condições relevantes, 4) Pontos de atenção, 5) Recomendações. ${foco?'Foco em: '+foco+'.':''}\n\nDocumento:\n${texto}`,
+    risco:`Faça uma análise de risco processual completa: 1) Probabilidade de êxito (%) com justificativa, 2) Principais riscos identificados, 3) Pontos fortes da tese, 4) Pontos vulneráveis, 5) Estratégia recomendada. ${foco?'Foco em: '+foco+'.':''}\n\nCaso:\n${texto}`,
+    clausulas:`Identifique e analise cláusulas abusivas, ilegais ou problemáticas neste contrato/documento: 1) Liste cada cláusula problemática com localização, 2) Explique o problema jurídico (CDC, CC, CF), 3) Sugira redação alternativa adequada. ${foco?'Foco em: '+foco+'.':''}\n\nTexto:\n${texto}`
+  };
+  await callAI(SYSTEM_JURIDICO, prompts[currentAnalise], 'analise-output-text');
+  showToast('Análise concluída!','success');
+}
+
+/* ──────────── ARGUMENTOS ──────────── */
+async function runArgumentos(){
+  const area=document.getElementById('arg-area').value;
+  const posicao=document.getElementById('arg-posicao').value;
+  const caso=document.getElementById('arg-caso').value;
+  if(!caso.trim()){ showToast('Descreva o caso.','error'); return; }
+  const prompts = {
+    favoraveis:`Como advogado ${posicao} na área de ${area}, liste os 5 melhores argumentos jurídicos favoráveis para o seguinte caso, com fundamentação em lei, doutrina e jurisprudência (cite artigos, súmulas e acórdãos específicos):\n\n${caso}`,
+    contra:`Como advogado ${posicao} na área de ${area}, antecipe e liste os 5 principais argumentos que a parte adversa irá apresentar no seguinte caso, e para cada um, apresente a melhor resposta/refutação com fundamentação jurídica:\n\n${caso}`,
+    jurisprudencia:`Para o seguinte caso de ${area} (${posicao}), pesquise e apresente a jurisprudência mais relevante: súmulas do STF/STJ/TST aplicáveis, acórdãos paradigmáticos, OJs (orientações jurisprudenciais) e tendências recentes dos tribunais superiores:\n\n${caso}`,
+    preliminares:`Para o seguinte caso de ${area}, identifique e analise todas as preliminares e prejudiciais processuais cabíveis (decadência, prescrição, ilegitimidade de parte, inépcia da petição, falta de interesse, coisa julgada, litispendência, etc.) com fundamento no CPC e legislação específica:\n\n${caso}`
+  };
+  await callAI(SYSTEM_JURIDICO, prompts[currentArg], 'arg-output-text');
+  showToast('Argumentos gerados!','success');
+}
+
+/* ──────────── PESQUISA ──────────── */
+async function runPesquisa(){
+  const tema=document.getElementById('pesquisa-input').value;
+  const tribunal=document.getElementById('pesquisa-tribunal').value;
+  if(!tema.trim()){ showToast('Digite um tema de pesquisa.','error'); return; }
+  const prompts = {
+    jurisprudencia_stj:`Pesquise e apresente a jurisprudência mais importante do STF e STJ sobre: "${tema}". ${tribunal?'Tribunais de interesse: '+tribunal+'.':''} Inclua: súmulas aplicáveis (com número), leading cases (com número do processo/recurso), tese fixada (se houver repercussão geral ou recurso repetitivo) e tendência atual dos tribunais.`,
+    legislacao:`Apresente a legislação aplicável ao tema: "${tema}". Inclua: artigos de lei específicos (com transcrição resumida), regulamentações infralegais relevantes, normas do CNJ se aplicável, e qualquer modificação legislativa recente. ${tribunal?'Jurisdição: '+tribunal+'.':''}`,
+    doutrina:`Apresente o posicionamento doutrinário dominante sobre: "${tema}". Inclua: posições dos principais autores brasileiros, debates doutrinários existentes, correntes majoritária e minoritária, e a posição que melhor se adequa à jurisprudência atual. ${tribunal?'Contexto: '+tribunal+'.':''}`,
+    prazo_prescricao:`Analise todos os prazos aplicáveis ao tema: "${tema}". Inclua: prazo prescricional (art. específico), prazo decadencial se houver, hipóteses de suspensão e interrupção (CC arts. 197-204), prazo processual para propositura, e como a jurisprudência tem aplicado esses prazos. ${tribunal?'Tribunal: '+tribunal+'.':''}`
+  };
+  await callAI(SYSTEM_JURIDICO, prompts[currentPesquisa], 'pesquisa-output-text');
+  showToast('Pesquisa concluída!','success');
+}
+
+/* ──────────── CHAT ──────────── */
+const chatHistory = [];
+async function sendChat(){
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML += `<div class="chat-msg user"><div class="chat-avatar user">L</div><div class="chat-bubble">${msg}</div></div>`;
+  const thinking = document.createElement('div');
+  thinking.className='chat-msg';
+  thinking.innerHTML=`<div class="chat-avatar ai">L</div><div class="chat-bubble thinking"><div class="dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(thinking);
+  msgs.scrollTop=msgs.scrollHeight;
+  chatHistory.push({role:'user',content:msg});
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:SYSTEM_JURIDICO,
+        messages:chatHistory.slice(-10)
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.map(c=>c.text||'').join('')||'Não obtive resposta.';
+    chatHistory.push({role:'assistant',content:text});
+    thinking.remove();
+    msgs.innerHTML+=`<div class="chat-msg"><div class="chat-avatar ai">L</div><div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div></div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  } catch(e){
+    thinking.remove();
+    msgs.innerHTML+=`<div class="chat-msg"><div class="chat-avatar ai">L</div><div class="chat-bubble" style="color:#E07070">Erro de conexão com a IA.</div></div>`;
+  }
+}
+
+/* ──────────── UTILS ──────────── */
+function copyOutput(id){
+  const t=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(()=>showToast('Texto copiado!','success')).catch(()=>showToast('Erro ao copiar.','error'));
+}
+function downloadText(id,filename){
+  const t=document.getElementById(id).textContent;
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(t);
+  a.download=filename; a.click();
+  showToast('Download iniciado!','success');
+}
+
+/* ──────────── CALENDAR ──────────── */
+function buildCalendar(){
+  const cal=document.getElementById('calendar');
+  if(!cal||cal.children.length>0) return;
+  const events=[16,18,22,25,28];
+  const firstDay=6; const days=31;
+  for(let i=0;i<firstDay;i++) cal.innerHTML+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const cls=d===14?'today':events.includes(d)?'event':'';
+    cal.innerHTML+=`<div class="cal-day ${cls}">${d}</div>`;
+  }
+}
+
+/* ──────────── CHARTS ──────────── */
+function buildCharts(){
+  const bar=document.getElementById('chart-bar');
+  if(!bar||bar.children.length>0) return;
+  const data=[{m:'Out',v:4},{m:'Nov',v:6},{m:'Dez',v:3},{m:'Jan',v:5},{m:'Fev',v:7},{m:'Mar',v:5}];
+  const max=Math.max(...data.map(d=>d.v));
+  const colors=['#8A7040','#8A7040','#8A7040','#B8975A','#C4A35A','#D4B580'];
+  const labels=document.getElementById('chart-labels');
+  data.forEach((d,i)=>{
+    const h=Math.round((d.v/max)*100);
+    bar.innerHTML+=`<div class="chart-bar" style="height:${h}%;background:${colors[i]};min-height:12px" title="${d.v} processos"></div>`;
+    labels.innerHTML+=`<div class="chart-bar-label" style="flex:1;font-size:10px;color:var(--text-muted);text-align:center">${d.m}<br><strong style="color:var(--text)">${d.v}</strong></div>`;
+  });
+  const area=document.getElementById('chart-area');
+  const areas=[{l:'Trabalhista',v:38,c:'#4A8C5C'},{l:'Cível',v:24,c:'#B8975A'},{l:'Consumidor',v:20,c:'#2A5C8C'},{l:'Empresarial',v:12,c:'#8A7040'},{l:'Família',v:6,c:'#6B4A8C'}];
+  areas.forEach(a=>{
+    area.innerHTML+=`<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px">
+        <span>${a.l}</span><span style="color:var(--text)">${a.v}%</span>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${a.v}%;background:${a.c}"></div></div>
+    </div>`;
+  });
+}
+
+/* ──────────── INIT ──────────── */
+buildCalendar();
+</script>
+</body>
+</html>
